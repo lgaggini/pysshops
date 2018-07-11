@@ -2,7 +2,6 @@
 
 import logging
 from paramiko import SSHClient, WarningPolicy
-import sys
 from socket import error, herror, gaierror, timeout
 
 
