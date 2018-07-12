@@ -9,6 +9,18 @@ sshops = SshOps('hostname.domain.it', 'username')
 with sshops as ssh:
     ssh.remote_command('ls -l /var/tmp')
 ```
+## Install
+### Git
+```
+git clone
+cd pysshops
+python setup.py install
+```
+
+### Pip (wip)
+```
+pip install pysshops
+```
 
 ## Features
 * simple
