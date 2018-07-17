@@ -20,7 +20,7 @@ class SshOps:
 
     def __enter__(self):
         """ get a ssh connection to hostname """
-        logger.info('opening connection to %s' % self.hostname)
+        logger.info('opening ssh connection to %s' % self.hostname)
         ssh = SSHClient()
         ssh.set_missing_host_key_policy(WarningPolicy())
         try:
@@ -62,9 +62,71 @@ class SshOps:
         self.ssh.close()
 
 
+class SftpOps:
+    hostname = ''
+    username = ''
+    ssh = None
+    sftp = None
+
+    def __init__(self, hostname, username):
+        """ init a hostname and username for sftp connection """
+        self.hostname = hostname
+        self.username = username
+
+    def __enter__(self):
+        """ get a sftp connection to hostname """
+        logger.info('opening sftp connection to %s' % self.hostname)
+        ssh = SSHClient()
+        sftp = None
+        ssh.set_missing_host_key_policy(WarningPolicy())
+        try:
+            ssh.connect(self.hostname, username=self.username)
+            sftp = ssh.open_sftp()
+        except (error, herror, gaierror, timeout) as neterr:
+            msg = 'network problem: %s' % (neterr)
+            logger.error(msg)
+            raise SftpNetworkException(msg)
+        self.ssh = ssh
+        self.sftp = sftp
+        return self
+
+    def deploy(self, src, dst, block=False):
+        """ deploy a local file to remote host """
+        try:
+            self.sftp.put(src, dst)
+        except Exception as ex:
+            msg = 'SFTP deploy exception: %s' % (ex)
+            logger.error(msg)
+            if block:
+                raise SftpCommandException(msg)
+
+    def chmod(self, dst, block=False):
+        """ chmod of a remote file """
+        try:
+            self.sftp.chmod(dst)
+        except Exception as ex:
+            msg = 'SFTP chmod exception: %s' % (ex)
+            logger.error(msg)
+            if block:
+                raise SftpCommandException(msg)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """ close the sftp connection at the end """
+        self.sftp.close()
+        self.ssh.close()
+
+
+class SshNetworkException(Exception):
+    pass
+
+
 class SshCommandBlockingException(Exception):
     pass
 
 
-class SshNetworkException(Exception):
+class SftpNetworkException(Exception):
+    pass
+
+
+class SftpCommandException(Exception):
     pass
