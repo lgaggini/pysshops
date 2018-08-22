@@ -46,7 +46,7 @@ class SshOps:
 
     def remote_command(self, command, block=True):
         """ execute a remote command by the ssh connection """
-        logger.debug(command)
+        logger.info('running %s on %s' % (command, self.hostname))
         stdin, stdout, stderr = self.ssh.exec_command(command)
         stdout_str = ' ,'.join(stdout.readlines())
         stderr_str = ' ,'.join(stderr.readlines())
@@ -59,6 +59,7 @@ class SshOps:
 
     def __exit__(self, exc_type, exc_value, traceback):
         """ close the ssh connection at the end """
+        logger.info('closing ssh connection to %s' % self.hostname)
         self.ssh.close()
 
 
@@ -92,6 +93,8 @@ class SftpOps:
 
     def deploy(self, src, dst, block=False):
         """ deploy a local file to remote host """
+        logger.info('deploying file %s to %s on %s' %
+                    (src, dst, self.hostname))
         try:
             self.sftp.put(src, dst)
         except Exception as ex:
@@ -102,6 +105,7 @@ class SftpOps:
 
     def chmod(self, dst, block=False):
         """ chmod of a remote file """
+        logger.info('chmodding file %s on %s' % (dst, self.hostname))
         try:
             self.sftp.chmod(dst)
         except Exception as ex:
@@ -112,6 +116,7 @@ class SftpOps:
 
     def __exit__(self, exc_type, exc_value, traceback):
         """ close the sftp connection at the end """
+        logger.info('closing sftp connection to %s' % self.hostname)
         self.sftp.close()
         self.ssh.close()
 
