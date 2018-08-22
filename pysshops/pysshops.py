@@ -105,11 +105,11 @@ class SftpOps:
             if block:
                 raise SftpCommandException(msg)
 
-    def chmod(self, dst, block=False):
+    def chmod(self, dst, perm, block=False):
         """ chmod of a remote file """
         logger.info('chmodding file %s on %s' % (dst, self.hostname))
         try:
-            self.sftp.chmod(dst)
+            self.sftp.chmod(dst, perm)
         except Exception as ex:
             msg = 'SFTP chmod exception: %s' % (ex)
             logger.error(msg)
