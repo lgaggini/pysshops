@@ -20,7 +20,8 @@ class SshOps:
 
     def __enter__(self):
         """ get a ssh connection to hostname """
-        logger.info('opening ssh connection to %s' % self.hostname)
+        logger.info('opening ssh connection to %s as %s' % (self.hostname,
+                                                            self.username))
         ssh = SSHClient()
         ssh.set_missing_host_key_policy(WarningPolicy())
         try:
@@ -78,7 +79,8 @@ class SftpOps:
 
     def __enter__(self):
         """ get a sftp connection to hostname """
-        logger.info('opening sftp connection to %s' % self.hostname)
+        logger.info('opening sftp connection to %s as %s' % (self.hostname,
+                                                             self.username))
         ssh = SSHClient()
         sftp = None
         ssh.set_missing_host_key_policy(WarningPolicy())
@@ -107,7 +109,9 @@ class SftpOps:
 
     def chmod(self, dst, perm, block=False):
         """ chmod of a remote file """
-        logger.info('chmodding file %s on %s' % (dst, self.hostname))
+        logger.info('chmodding file %s on %s to %s' % (dst,
+                                                       self.hostname,
+                                                       perm))
         try:
             self.sftp.chmod(dst, perm)
         except Exception as ex:
