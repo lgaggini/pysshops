@@ -36,13 +36,15 @@ class SshOps:
         """ check the exit code and if not 0 log stderror and exit
         (if blocking command) """
         if exitcode == 0:
-            return
+            return stdout
         else:
             msg = 'ssh command failed with exit code %s: %s' \
                    % (str(exitcode), stderr)
             logger.error(msg)
             if block:
                 raise SshCommandBlockingException(msg)
+            else:
+                return exitcode, stderr
 
     def remote_command(self, command, block=True):
         """ execute a remote command by the ssh connection """
