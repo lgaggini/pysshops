@@ -3,6 +3,7 @@
 import logging
 from paramiko import SSHClient, WarningPolicy
 from socket import error, herror, gaierror, timeout
+import os
 
 
 logger = logging.getLogger('pysshops')
@@ -97,6 +98,9 @@ class SftpOps:
 
     def deploy(self, src, dst, block=False):
         """ deploy a local file to remote host """
+        if not os.path.exists(src):
+            logger.warning('Missing %s file and will not be deployed' % src)
+            return
         logger.info('deploying file %s to %s on %s' %
                     (src, dst, self.hostname))
         try:
@@ -106,6 +110,15 @@ class SftpOps:
             logger.error(msg)
             if block:
                 raise SftpCommandException(msg)
+        logger.info('verify the deployed file')
+        command = 'sudo ls -l %s' % (dst)
+        stdin, stdout, stderr = self.ssh.exec_command(command)
+        exitcode = stdout.channel.recv_exit_status()
+        if exitcode != 0:
+            msg = 'deploy of %s to %s failed: %s, exitcode %s' \
+                   % (src, dst, stderr, str(exitcode))
+            logger.error(msg)
+        logger.info('file %s correctly deployed to %s' % (src, dst))
 
     def chmod(self, dst, perm, block=False):
         """ chmod of a remote file """
