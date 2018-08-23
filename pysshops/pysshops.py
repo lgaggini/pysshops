@@ -10,23 +10,31 @@ logger = logging.getLogger('pysshops')
 
 
 class SshOps:
-    hostname = ""
-    username = ""
+    hostname = ''
+    port = 22
+    username = ''
+    password = ''
+    key_filename = ''
     ssh = None
 
-    def __init__(self, hostname, username):
+    def __init__(self, hostname, username=None, port=22, password=None,
+                 key_filename=None):
         """ init a hostname and username for ssh connection """
         self.hostname = hostname
+        self.port = port
         self.username = username
+        self.password = password
+        self.key_filename = key_filename
 
     def __enter__(self):
         """ get a ssh connection to hostname """
-        logger.info('opening ssh connection to %s as %s' % (self.hostname,
-                                                            self.username))
+        logger.info('opening ssh connection to %s as %s on port %s'
+                    % (self.hostname, self.username, self.port))
         ssh = SSHClient()
         ssh.set_missing_host_key_policy(WarningPolicy())
         try:
-            ssh.connect(self.hostname, username=self.username)
+            ssh.connect(self.hostname, username=self.username, port=self.port,
+                        password=self.password, key_filename=self.key_filename)
         except (error, herror, gaierror, timeout) as neterr:
             msg = 'network problem: %s' % (neterr)
             logger.error(msg)
@@ -69,24 +77,33 @@ class SshOps:
 
 class SftpOps:
     hostname = ''
+    port = 22
     username = ''
+    password = ''
+    key_filename = ''
     ssh = None
     sftp = None
 
-    def __init__(self, hostname, username):
+    def __init__(self, hostname, username=None, port=22, password=None,
+                 key_filename=None):
         """ init a hostname and username for sftp connection """
         self.hostname = hostname
+        self.port = port
         self.username = username
+        self.password = password
+        self.key_filename = key_filename
 
     def __enter__(self):
         """ get a sftp connection to hostname """
-        logger.info('opening sftp connection to %s as %s' % (self.hostname,
-                                                             self.username))
+        logger.info('opening sftp connection to %s as %s on port %s'
+                    % (self.hostname, self.username, self.port))
         ssh = SSHClient()
         sftp = None
         ssh.set_missing_host_key_policy(WarningPolicy())
         try:
-            ssh.connect(self.hostname, username=self.username)
+            ssh.connect(hostname=self.hostname, username=self.username,
+                        port=self.port, password=self.password,
+                        key_filename=self.key_filename)
             sftp = ssh.open_sftp()
         except (error, herror, gaierror, timeout) as neterr:
             msg = 'network problem: %s' % (neterr)
