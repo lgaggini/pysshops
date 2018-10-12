@@ -46,7 +46,7 @@ class SshOps:
         """ check the exit code and if not 0 log stderror and exit
         (if blocking command) """
         if exitcode == 0:
-            return stdout
+            return exitcode, stdout
         else:
             msg = 'ssh command failed with exit code %s: %s' \
                    % (str(exitcode), stderr)
