@@ -5,7 +5,7 @@ with open('README.md') as file:
 
 setup(
     name='pysshops',
-    version=' 0.2.1',
+    version=' 0.2.2',
     author='Lorenzo Gaggini',
     author_email='lg@lgaggini.net',
     packages=['pysshops'],
